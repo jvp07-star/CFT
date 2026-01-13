@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Carbon Footprint Tracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    html { scroll-behavior: smooth; }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-green-50 via-white to-teal-50 min-h-screen">
+
+  <!-- Header -->
+  <header class="bg-green-800/80 backdrop-blur-md text-white shadow-md sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+      <a href="index.html" class="text-2xl font-bold hover:underline">🌱 Carbon Footprint Tracker</a>
+      <nav class="space-x-6">
+        <a href="#dashboard" class="hover:underline">Dashboard</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Location Tracker -->
+  <section class="bg-yellow-50 border border-yellow-200 rounded-xl p-4 max-w-4xl mx-auto mt-6 text-center">
+    <p class="text-lg font-semibold text-yellow-700">📍 Your approximate location:
+      <span id="userLocation" class="font-bold">Detecting...</span>
+    </p>
+  </section>
+
+  <!-- Form Section -->
+  <section id="dashboard" class="bg-white shadow-lg rounded-xl p-8 max-w-4xl mx-auto mt-8">
+    <h2 class="text-2xl font-bold text-green-700 mb-6">Enter Vehicle & Environment Data</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+      <!-- Vehicle Type -->
+      <div>
+        <label class="block text-sm font-semibold text-gray-700">Vehicle Type</label>
+        <select id="vehicleType" class="mt-1 block w-full rounded-md border-2 border-gray-400 shadow-sm focus:border-green-600 focus:ring-green-600">
+          <option value="car">Car</option>
+          <option value="motorcycle">Motorcycle</option>
+          <option value="truck">Truck</option>
+          <option value="bus">Bus</option>
+          <option value="auto">Auto-rickshaw</option>
+          <option value="lcv">Light commercial vehicle</option>
+        </select>
+      </div>
+
+      <!-- Fuel Type -->
+      <div>
+        <label class="block text-sm font-semibold text-gray-700">Fuel Type</label>
+        <select id="fuelType" class="mt-1 block w-full rounded-md border-2 border-gray-400 shadow-sm focus:border-green-600 focus:ring-green-600">
+          <option value="petrol">Petrol</option>
+          <option value="diesel">Diesel</option>
+          <option value="cng">CNG</option>
+          <option value="electric">Electric</option>
+          <option value="hybrid">Hybrid</option>
+        </select>
+      </div>
+
+      <!-- Engine Size -->
+      <div>
+        <label class="block text-sm font-semibold text-gray-700">Engine Size (L)</label>
+        <input id="engineSize" list="engineSizeSuggestions" type="number" step="0.1"
+          class="form-input mt-1 block w-full border-2 border-gray-400 rounded-md focus:border-green-600 focus:ring-green-600" />
+        <datalist id="engineSizeSuggestions">
+          <option value="1.2">Small car (1.2 L)</option>
+          <option value="1.5">Compact sedan (1.5 L)</option>
+          <option value="2.0">SUV (2.0 L)</option>
+          <option value="3.0">Truck (3.0 L)</option>
+        </datalist>
+      </div>
+
+      <!-- Vehicle Age -->
+      <div>
+        <label class="block text-sm font-semibold text-gray-700">Vehicle Age</label>
+        <input id="vehicleAge" type="number"
+          class="form-input mt-1 block w-full border-2 border-gray-400 rounded-md focus:border-green-600 focus:ring-green-600" />
+      </div>
+
+      <!-- Aerodynamics -->
+      <div>
+        <label class="block text-sm font-semibold text-gray-700">Aerodynamics</label>
+        <select id="aero" class="form-select mt-1 block w-full border-2 border-gray-400 rounded-md focus:border-green-600 focus:ring-green-600">
+          <option value="good">Good</option>
+          <option value="average">Average</option>
+          <option value="poor">Poor</option>
+        </select>
+      </div>
+
+      <!-- Load -->
+      <div>
+        <label class="block text-sm font-semibold text-gray-700">Load</label>
+        <select id="load" class="form-select mt-1 block w-full border-2 border-gray-400 rounded-md focus:border-green-600 focus:ring-green-600">
+          <option value="light">Light</option>
+          <option value="medium">Medium</option>
+          <option value="heavy">Heavy</option>
+        </select>
+      </div>
+
+      <!-- City -->
+      <div>
+        <label class="block text-sm font-semibold text-gray-700">City</label>
+        <input id="city" type="text"
+        class="form-input mt-1 block w-full border-2 border-gray-400 rounded-md focus:border-green-600 focus:ring-green-600"
+        placeholder="Enter city manually or select below" />
+  
+      <!-- Manual City Selector -->
+        <select id="citySelector"
+        class="mt-2 block w-full rounded-md border-2 border-gray-400 shadow-sm focus:border-green-600 focus:ring-green-600">
+          <option value="">-- Select a city --</option>
+          <option value="Bengaluru">Bengaluru</option>
+          <option value="Delhi">Delhi</option>
+          <option value="Mumbai">Mumbai</option>
+          <option value="Chennai">Chennai</option>
+          <option value="Kolkata">Kolkata</option>
+          <option value="Hyderabad">Hyderabad</option>
+          <option value="Pune">Pune</option>
+          <option value="Ahmedabad">Ahmedabad</option>
+          <option value="Jaipur">Jaipur</option>
+        </select>
+      </div>
+
+
+      <!-- Temperature -->
+      <div>
+        <label class="block text-sm font-semibold text-gray-700">Temperature (°C)</label>
+        <input id="temp" type="number" step="0.1"
+          class="form-input mt-1 block w-full border-2 border-gray-400 rounded-md focus:border-green-600 focus:ring-green-600" />
+      </div>
+
+      <!-- Road Gradient -->
+      <div>
+        <label class="block text-sm font-semibold text-gray-700">Road Gradient (%)</label>
+        <input id="gradient" type="number" step="0.1"
+          class="form-input mt-1 block w-full border-2 border-gray-400 rounded-md focus:border-green-600 focus:ring-green-600" />
+      </div>
+
+      <!-- Road Network -->
+      <div>
+        <label class="block text-sm font-semibold text-gray-700">Road Network</label>
+        <select id="network" class="form-select mt-1 block w-full border-2 border-gray-400 rounded-md focus:border-green-600 focus:ring-green-600">
+          <option value="urban_dense">Urban Dense</option>
+          <option value="urban_moderate">Urban Moderate</option>
+          <option value="peri_urban">Peri-Urban</option>
+          <option value="rural">Rural</option>
+          <option value="highway">Highway</option>
+        </select>
+      </div>
+
+      <!-- Population Density -->
+      <div>
+        <label class="block text-sm font-semibold text-gray-700">Population Density</label>
+        <input id="popDensity" list="popDensitySuggestions" type="number"
+          class="form-input mt-1 block w-full border-2 border-gray-400 rounded-md focus:border-green-600 focus:ring-green-600" />
+        <datalist id="popDensitySuggestions">
+          <option value="500">Rural (~500 people/km²)</option>
+          <option value="3000">Town (~3,000 people/km²)</option>
+          <option value="10000">City (~10,000 people/km²)</option>
+          <option value="25000">Dense metro (~25,000 people/km²)</option>
+        </datalist>
+      </div>
+    </div>
+
+    <div class="flex gap-4 mt-8">
+      <button id="estimate" class="bg-green-600 text-white px-5 py-2 rounded-lg font-semibold hover:bg-green-700 transition">Estimate</button>
+      <button id="reset" class="bg-red-500 text-white px-5 py-2 rounded-lg font-semibold hover:bg-red-600 transition">Reset</button>
+    </div>
+  </section>
+
+  <!-- Output Section -->
+  <section class="bg-white shadow-lg rounded-xl p-8 max-w-4xl mx-auto mt-8">
+    <h2 class="text-2xl font-bold text-green-700 mb-6">Insights</h2>
+    <div id="badges" class="flex gap-2 mb-4"></div>
+    <div id="output" class="space-y-4"></div>
+
+    <!-- Circular Progress -->
+    <div class="mt-8 flex justify-center">
+      <svg id="progressCircle" width="160" height="160" viewBox="0 0 160 160">
+        <circle cx="80" cy="80" r="70" stroke="#e5e7eb" stroke-width="15" fill="none"></circle>
+        <circle id="progressBar" cx="80" cy="80" r="70" stroke="#10b981" stroke-width="15" fill="none"
+          stroke-dasharray="439.6" stroke-dashoffset="439.6" stroke-linecap="round"></circle>
+        <text id="progressText" x="80" y="85" text-anchor="middle" font-size="20" fill="#374151" font-weight="bold">0%</text>
+      </svg>
+    </div>
+    <p class="text-sm text-gray-600 mt-2 text-center">Target: ≤ 150 g/km (Paris Agreement aligned)</p>
+
+    <!-- Eco Tips -->
+    <div class="mt-10 bg-green-50 border border-green-200 rounded-xl p-6">
+      <h3 class="text-xl font-bold text-green-700 mb-4">🌿 Sustainability Tips</h3>
+      <ul id="ecoTips" class="list-disc list-inside text-gray-700 space-y-2"></ul>
+    </div>
+
+    <!-- Sustainability Score -->
+    <div class="mt-10 bg-teal-50 border border-teal-200 rounded-xl p-6 text-center">
+      <h3 class="text-xl font-bold text-teal-700 mb-4">🌍 Sustainability Score</h3>
+      <p id="sustainScore" class="text-4xl font-extrabold text-teal-800">0 / 100</p>
+    </div>
+
+    <!-- Summary Banner -->
+    <div id="summaryBanner" class="mt-10 text-center p-4 rounded-lg font-bold text-lg"></div>
+
+    <!-- History Chart -->
+    <div class="mt-6 bg-white border border-gray-200 rounded-xl p-6">
+      <h3 class="text-xl font-bold text-purple-700 mb-4">📈 Emissions & Sustainability Trends</h3>
+      <canvas id="historyChart" width="600" height="300"></canvas>
+    </div>
+
+    <!-- History Log (at end) -->
+    <div class="mt-10 bg-white border border-gray-200 rounded-xl p-6">
+      <h3 class="text-xl font-bold text-blue-700 mb-4">📜 History Log</h3>
+      <table class="min-w-full divide-y divide-gray-200 text-sm">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-4 py-2 text-left font-semibold text-gray-700">Date</th>
+            <th class="px-4 py-2 text-left font-semibold text-gray-700">City</th>
+            <th class="px-4 py-2 text-left font-semibold text-gray-700">Emissions (g/km)</th>
+            <th class="px-4 py-2 text-left font-semibold text-gray-700">Score</th>
+          </tr>
+        </thead>
+        <tbody id="historyLog" class="divide-y divide-gray-100"></tbody>
+      </table>
+      <div class="mt-4 text-right">
+        <button id="downloadCSV" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition">
+          ⬇️ Download CSV
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <script src="script.js"></script>
+</body>
+</html>
+
