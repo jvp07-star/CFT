@@ -153,9 +153,11 @@ function modifiers({ engineSize, vehicleAge, aero, load, temp, gradient, network
 function estimateEmissions(inputs) {
   const base = baseEmissionByVehicle(inputs.vehicleType, inputs.fuelType);
   const factor = modifiers(inputs);
-  const emissions = Math.max(0, base * factor);
-  return emissions;
+  const emissionsPerKm = Math.max(0, base * factor);
+  const totalEmissions = inputs.distance ? emissionsPerKm * inputs.distance : null;
+  return { emissionsPerKm, totalEmissions };
 }
+
 
 // -----------------------------
 // Sustainability Score & Tips
@@ -332,13 +334,24 @@ function updateChart() {
 // -----------------------------
 function getInputs() {
   const getNum = (id) => {
-    const v = document.getElementById(id).value;
+    const v = document.getElementById(id)?.value;
     return v === "" ? null : Number(v);
   };
+
+  let engineSize = null;
+  const vehicleType = document.getElementById("vehicleType")?.value || "car";
+
+  if (vehicleType === "motorcycle") {
+    const cc = getNum("engineCC");
+    engineSize = cc ? cc / 1000 : null; // convert cc → liters
+  } else {
+    engineSize = getNum("engineSize");
+  }
+
   return {
-    vehicleType: document.getElementById("vehicleType")?.value || "car",
+    vehicleType,
     fuelType: document.getElementById("fuelType")?.value || "petrol",
-    engineSize: getNum("engineSize"),
+    engineSize,
     vehicleAge: getNum("vehicleAge"),
     aero: document.getElementById("aero")?.value || "average",
     load: document.getElementById("load")?.value || "light",
@@ -347,24 +360,51 @@ function getInputs() {
     gradient: getNum("gradient"),
     network: document.getElementById("network")?.value || "urban_moderate",
     popDensity: getNum("popDensity"),
+    distance: getNum("distance")
   };
 }
 
+
 function onEstimate() {
   const inputs = getInputs();
-  const emissions = estimateEmissions(inputs);
-  const score = sustainabilityScore(emissions);
-  const tips = generateTips(inputs, emissions);
+
+  // Now returns { emissionsPerKm, totalEmissions }
+  const { emissionsPerKm, totalEmissions } = estimateEmissions(inputs);
+
+  // Sustainability score is based on per‑km emissions
+  const score = sustainabilityScore(emissionsPerKm);
+
+  // Tips also use per‑km emissions
+  const tips = generateTips(inputs, emissionsPerKm);
 
   // Output panel
-  renderBadges(inputs, emissions);
+  renderBadges(inputs, emissionsPerKm);
   renderTips(tips);
   renderScore(score);
-  updateProgress(emissions);
-  renderSummaryBanner(emissions);
+  updateProgress(emissionsPerKm);
+  renderSummaryBanner(emissionsPerKm);
 
-  // History
-  const entry = { date: formatDate(), city: inputs.city, emissions, score };
+  // Show total emissions if distance entered
+  const output = document.getElementById("output");
+  output.innerHTML = "";
+  const p = document.createElement("p");
+  p.className = "text-lg font-semibold text-gray-700";
+  if (totalEmissions !== null) {
+    p.textContent = `Total emissions for your trip: ${totalEmissions.toFixed(1)} g`;
+  } else {
+    p.textContent = `Per‑km emissions: ${emissionsPerKm.toFixed(1)} g/km`;
+  }
+  output.appendChild(p);
+
+  // History entry now includes distance + total emissions
+  const entry = {
+    date: formatDate(),
+    city: inputs.city,
+    emissions: emissionsPerKm,
+    score,
+    distance: inputs.distance || null,
+    totalEmissions
+  };
   historyData.push(entry);
   saveHistory();
   renderHistory();
@@ -401,6 +441,8 @@ function onReset() {
 // -----------------------------
 // Init
 // -----------------------------
+
+
 document.addEventListener("DOMContentLoaded", () => {
   // Bind buttons
   document.getElementById("estimate")?.addEventListener("click", onEstimate);
@@ -412,4 +454,22 @@ document.addEventListener("DOMContentLoaded", () => {
   renderHistory();
   initChart();
   updateProgress(0);
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  const vehicleType = document.getElementById("vehicleType");
+  const litersDiv = document.getElementById("engineSizeLiters");
+  const ccDiv = document.getElementById("engineSizeCC");
+
+  if (vehicleType) {
+    vehicleType.addEventListener("change", () => {
+      if (vehicleType.value === "motorcycle") {
+        litersDiv.style.display = "none";
+        ccDiv.style.display = "block";
+      } else {
+        litersDiv.style.display = "block";
+        ccDiv.style.display = "none";
+      }
+    });
+  }
 });

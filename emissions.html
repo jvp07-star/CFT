@@ -17,7 +17,7 @@
     <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
       <a href="index.html" class="text-2xl font-bold hover:underline">🌱 Carbon Footprint Tracker</a>
       <nav class="space-x-6">
-        <a href="#dashboard" class="hover:underline">Dashboard</a>
+        <a href="#dashboard" class="hover:underline">Home</a>
       </nav>
     </div>
   </header>
@@ -33,6 +33,13 @@
   <section id="dashboard" class="bg-white shadow-lg rounded-xl p-8 max-w-4xl mx-auto mt-8">
     <h2 class="text-2xl font-bold text-green-700 mb-6">Enter Vehicle & Environment Data</h2>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+      <!-- Distance Travelled -->
+      <div>
+        <label class="block text-sm font-semibold text-gray-700">Distance Travelled (km)</label>
+        <input id="distance" type="number" step="0.1" class="form-input mt-1 block w-full border-2 border-gray-400 rounded-md focus:border-green-600 focus:ring-green-600" placeholder="e.g., 15" />
+      </div>
+
 
       <!-- Vehicle Type -->
       <div>
@@ -61,7 +68,7 @@
 
       <!-- Engine Size -->
       <div>
-        <label class="block text-sm font-semibold text-gray-700">Engine Size (L)</label>
+        <label class="block text-sm font-semibold text-gray-700">Engine Size (L) (Enter cc for bikes) </label>
         <input id="engineSize" list="engineSizeSuggestions" type="number" step="0.1"
           class="form-input mt-1 block w-full border-2 border-gray-400 rounded-md focus:border-green-600 focus:ring-green-600" />
         <datalist id="engineSizeSuggestions">
@@ -72,9 +79,15 @@
         </datalist>
       </div>
 
+      <!-- Engine Size for Bikes (cc) --> 
+      <div id="engineSizeCC" style="display:none;"> 
+        <label class="block text-sm font-semibold text-gray-700">Engine Size (cc)</label> 
+        <input id="engineCC" type="number" step="10" class="form-input mt-1 block w-full border-2 border-gray-400 rounded-md focus:border-green-600 focus:ring-green-600" placeholder="e.g., 150" /> 
+      </div>
+
       <!-- Vehicle Age -->
       <div>
-        <label class="block text-sm font-semibold text-gray-700">Vehicle Age</label>
+        <label class="block text-sm font-semibold text-gray-700">Vehicle Age (years)</label>
         <input id="vehicleAge" type="number"
           class="form-input mt-1 block w-full border-2 border-gray-400 rounded-md focus:border-green-600 focus:ring-green-600" />
       </div>
